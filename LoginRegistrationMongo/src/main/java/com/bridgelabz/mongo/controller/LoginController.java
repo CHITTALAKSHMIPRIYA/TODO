@@ -11,49 +11,42 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.mongo.model.User;
-import com.bridgelabz.mongo.service.UserService;
+import com.bridgelabz.mongo.service.UserServiceImpl;
+import com.bridgelabz.mongo.token.TokenGenerator;
+import com.bridgelabz.mongo.util.LoginUtility;
 
 @RestController
-@RequestMapping("/LoginRegister")
-public class LoginController {
-public static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-	
+public class LoginController 
+{
 	@Autowired
-	UserService userService;
-	
-	// -------------------User Login---------------------------------------------
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "/login/", method = RequestMethod.POST)
-	public ResponseEntity<String> login(@RequestBody User checkUser) {
-		logger.info("Logging User : {}", checkUser);
-		
-		User user = userService.login(checkUser.getEmailId(), checkUser.getPassword());
-        if (user == null) {
-            logger.error("User with email {} not found.", checkUser.getEmailId());
-            return new ResponseEntity("User with email " + checkUser.getEmailId()
-                    + " not found", HttpStatus.NOT_FOUND);
-        }
-        String message = "Hello, " + user.getUserName() + " Id:- "+ user.getUserId() + " Email:- "
-        				+ user.getEmailId() + " Phone Number:- " + user.getPhoneNumber(); 
-        return new ResponseEntity<String>(message, HttpStatus.OK);
-	}
-	
-	// -------------------User Register---------------------------------------------
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/register/", method = RequestMethod.POST)
-	public ResponseEntity<String> register(@RequestBody User checkUser){
-		logger.info("Register user : {}", checkUser);
-		
-		boolean registered = userService.register(checkUser);
-		if(!registered) {
-			logger.error("User with email {} already present.", checkUser.getEmailId());
-			return new ResponseEntity("User with email " + checkUser.getEmailId()
-            + " already present", HttpStatus.CONFLICT);
-		}
-		logger.info("User registered with : {}", checkUser.getEmailId());
-		String message = "Successfully registired";
-		return new ResponseEntity<String>(message, HttpStatus.OK);
-	}
-	
-}
+	private UserServiceImpl userServiceImpl;
+	@Autowired
+	private TokenGenerator token;
+	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public ResponseEntity<User> loginUser(@RequestBody User user) {
+		if (!userServiceImpl.verifyByuserName(user).get().equals(null)) {
+			String validToken = token.generator(user);
+			logger.info("Your token: " + validToken);
+			token.parseJWT(validToken);
+			return new ResponseEntity("Welcome " + user.toString(), HttpStatus.OK);
+		}
+		return new ResponseEntity(new LoginUtility("Please register!!!Username doesn't exist"), HttpStatus.CONFLICT);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public ResponseEntity<User> registerUser(@RequestBody User user) {
+		if (!userServiceImpl.verifyEmail(user)) {
+			String validToken = token.generator(user);
+			logger.info("Your token: " + validToken);
+			token.parseJWT(validToken);
+			userServiceImpl.saveUser(user);
+			return new ResponseEntity("User successfully registered", HttpStatus.OK);
+		}
+		return new ResponseEntity(new LoginUtility("username already exists"), HttpStatus.CONFLICT);
+	}
+
+}
