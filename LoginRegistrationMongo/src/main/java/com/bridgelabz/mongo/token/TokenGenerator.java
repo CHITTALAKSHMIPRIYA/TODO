@@ -21,7 +21,7 @@ public class TokenGenerator {
 		String userName = user.getUserName();
 		String passkey = user.getPassword();
 		long time = System.currentTimeMillis();
-		long nowMillis = System.currentTimeMillis() + (1 * 60);
+		long nowMillis = System.currentTimeMillis() + (20* 60*60*1000);
 		Date now = new Date(nowMillis);
 		JwtBuilder builder = Jwts.builder().setId(passkey).setIssuedAt(now).setSubject(userName)
 				.signWith(SignatureAlgorithm.HS256, KEY);
@@ -37,5 +37,6 @@ public class TokenGenerator {
 				.getBody();
 		System.out.println("Id: " + claims.getId());
 		System.out.println("Sub: " + claims.getSubject());
+		
 	}
 }

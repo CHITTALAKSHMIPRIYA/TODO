@@ -3,9 +3,8 @@ package com.bridgelabz.mongo.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection="User")
+@Document(collection = "User")
 public class User {
-	
 
 	@Id
 	private String userName;
@@ -15,8 +14,8 @@ public class User {
 	private String mobile;
 	private String email;
 
-	User(){
-		
+	User() {
+
 	}
 
 	public String getUserName() {
@@ -66,6 +65,7 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
 	@Override
 	public String toString() {
 		return "User [userName=" + userName + ", password=" + password + ", firstName=" + firstName + ", lastName="
