@@ -7,6 +7,6 @@ import com.bridgelabz.mongo.model.User;
 public interface IUserService 
 {
 	public boolean verifyEmail(User user);
-    public void saveUser(User user);
+    public User saveUser(User user);
     Optional<User> verifyByuserName(User user);
 }

@@ -16,6 +16,7 @@ public class UserServiceImpl implements IUserService {
 	/**
 	 * To verify userName exists in database or not
 	 */
+
 	@Override
 	public Optional<User> verifyByuserName(User user) {
 		return userDao.findById(user.getUserName());
@@ -34,8 +35,13 @@ public class UserServiceImpl implements IUserService {
 	 * To save user info in database
 	 */
 	@Override
-	public void saveUser(User user) {
-		userDao.insert(user);
+	public User saveUser(User user) {
+		return userDao.insert(user);
+	}
+
+	public User getByEmail(String email) {
+		// TODO Auto-generated method stub
+		return userDao.findByEmail(email);
 	}
 
 }

@@ -8,4 +8,6 @@ import com.bridgelabz.mongo.model.User;
 @Repository
 public interface IUserDAO extends MongoRepository<User, String> {
 
+	User findByEmail(String email);
+
 }
